@@ -1,0 +1,137 @@
+Sub stock_test()
+
+For Each ws In Worksheets
+
+    Dim column As Integer
+    Dim TickerColumn As Integer
+    'Dim yrly_perc As Long
+    'Dim yrly_chg As Long
+    'Dim close_num As Long
+    
+    
+   ' Dim lastrow_11 As Long
+    'dim lastrow_11final as Long
+
+    counter = 0
+    vol = 0
+    
+    TickerColumn = 1
+    
+    
+    WorksheetName = ws.Name
+    LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+    'LastColumn = ws.Cells(1, Columns.Count).End(xlToLeft).column
+
+
+        ws.Cells(1, 9).Value = "Ticker"
+        ws.Cells(1, 10).Value = "Yearly Change"
+        ws.Cells(1, 11).Value = "Percent Change"
+        ws.Cells(1, 12).Value = "Total Stock Volume"
+        
+
+    For Row = 2 To LastRow
+       
+        If ws.Cells(Row + 1, TickerColumn).Value <> ws.Cells(Row, TickerColumn).Value Then
+
+            Temp_LastRow = ws.Cells(Rows.Count, 9).End(xlUp).Row
+            'lastrow_11 = ws.Cells(Rows.Count, 11).End(xlUp).Row
+            'lastrow_11final=lastrow_11+1
+            ws.Cells(Temp_LastRow + 1, 9).Value = ws.Cells(Row, TickerColumn).Value
+
+            close_num = ws.Cells(Row, 6).Value
+            open_num = ws.Cells(Row - counter, 3).Value
+            yrly_chg = (close_num - open_num)
+            ws.Cells(ws.Cells(Rows.Count, 10).End(xlUp).Row + 1, 10).Value = yrly_chg
+            
+            'ws.Cells(2, 15).Value = ws.Cells(Rows.Count, 11).End(xlUp).Row
+            'ws.Cells(2, 16).Value = ws.Cells(Rows.Count, 11).End(xlUp).Row + 1
+            'ws.Cells(2, 17).Value = yrly_perc
+            'yrly_perc = yrly_chg / close_num
+            If yrly_chg = 0 Then
+                ws.Cells(ws.Cells(Rows.Count, 11).End(xlUp).Row + 1, 11).Value = 0
+            ElseIf close_num = 0 Then
+                ws.Cells(ws.Cells(Rows.Count, 11).End(xlUp).Row + 1, 11).Value = 0
+            Else
+                ws.Cells(ws.Cells(Rows.Count, 11).End(xlUp).Row + 1, 11).Value = (yrly_chg / close_num)
+            End If
+            ws.Columns("K").NumberFormat = "0.00%"
+
+            vol = vol + ws.Cells(Row, 7).Value
+            ws.Cells(ws.Cells(Rows.Count, 12).End(xlUp).Row + 1, 12).Value = vol
+            vol = 0
+
+            counter = 0
+
+        Else
+            counter = counter + 1
+            vol = vol + ws.Cells(Row, 7).Value
+        End If
+
+    Next Row
+    max_check = 0
+    min_check = 0
+    vol_max = 0
+     LastRow_bypercent = ws.Cells(Rows.Count, 11).End(xlUp).Row
+     For percent_Row = 2 To LastRow_bypercent
+        If ws.Cells(percent_Row, 11).Value > 0 Then
+            ws.Cells(percent_Row, 11).Interior.ColorIndex = 4
+        ElseIf ws.Cells(percent_Row, 11).Value < 0 Then
+            ws.Cells(percent_Row, 11).Interior.ColorIndex = 3
+        End If
+
+        If ws.Cells(percent_Row, 11) > max_check Then
+            max_check = ws.Cells(percent_Row, 11)
+            max_row = ws.Cells(percent_Row, 9)
+        Else
+        End If
+
+
+        If ws.Cells(percent_Row, 11) < min_check Then
+            min_check = ws.Cells(percent_Row, 11)
+            min_row = ws.Cells(percent_Row, 9)
+        Else
+        End If
+
+        If ws.Cells(percent_Row, 12) > vol_max Then
+            vol_max = ws.Cells(percent_Row, 12)
+            vol_row = ws.Cells(percent_Row, 9)
+        Else
+        End If
+
+    Next percent_Row
+
+
+    ws.Cells(2, 15).Value = "Greatest % Increase"
+    ws.Cells(3, 15).Value = "Greatest % Decrease"
+    ws.Cells(4, 15).Value = "Greatest Total Volume"
+    ws.Cells(1, 16).Value = "Ticker"
+    ws.Cells(1, 17).Value = "Value"
+
+    ws.Cells(2, 17).Value = max_check
+    ws.Cells(2, 17).NumberFormat = "0.00%"
+    ws.Cells(2, 16).Value = max_row
+    
+    ws.Cells(3, 17).Value = min_check
+    ws.Cells(3, 17).NumberFormat = "0.00%"
+    ws.Cells(3, 16).Value = min_row
+
+    ws.Cells(4, 17).Value = vol_max
+    ws.Cells(4, 17).NumberFormat = "0.00E+0"
+    ws.Cells(4, 16).Value = vol_row
+    
+    ws.Columns("O").AutoFit
+
+Next ws
+    
+End Sub
+
+
+
+
+
+
+
+
+
+
+
